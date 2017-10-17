@@ -39,7 +39,6 @@ export default class LTable extends React.Component {
         return (
 
             <div>
-                <Button type="primary" style={{marginBottom: 10}} icon="plus">新增人员信息</Button>
                 <Table columns={columns} dataSource={data} rowKey="user_id" />
             </div>
         )
