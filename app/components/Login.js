@@ -4,43 +4,54 @@
 
 import React from 'react';
 
-import { Form, Icon, Input, Button, Checkbox, Spin, Modal } from 'antd';
+import { Form, Icon, Input, Button, Checkbox, Spin, Modal, message } from 'antd';
 const FormItem = Form.Item;
 
 import NewUser from './NewUser';
+import ResetPassword from './ResetPassword';
 
 class NormalLoginForm extends React.Component {
 
     state = {
         spinning: false,
-        visible: false
+        visible: false,
+        visiblePwd: false
     }
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
 
-                if (localStorage[values.username] && localStorage[values.username] === values.password) {
-
-                    this.invokeLogin();
+                if (values.user_email === 'admin' && values.user_pwd === 'admin') {
+                    this.invokeLogin('admin');
+                    return;
                 }
 
-                if (values.username === 'admin' && values.password === 'admin') {
-                    this.invokeLogin();
-                }
+                if (localStorage.users) {
 
+                    var users = JSON.parse(localStorage.users);
+                    var user = users.filter(u => u.user_email === values.user_email && u.user_pwd === values.user_pwd);
+                   
+                    if (user.length > 0) {
+                        this.invokeLogin(user[0].user_email);
+                    } else {
+                        message.error('邮箱或密码错误!');
+                        return;
+                    }
+
+                }
             }
         });
     }
 
 
-    invokeLogin = () => {
+    invokeLogin = (user_email) => {
 
         this.setState({ spinning: true }, () => {
 
             setTimeout(() => {
                 this.setState({ spinning: false }, () => {
-                    this.props.login();
+                    this.props.login(user_email);
                 })
             }, 1500);
         })
@@ -81,14 +92,14 @@ class NormalLoginForm extends React.Component {
                             backgroundColor: 'white'
                         }}>
                         <FormItem>
-                            {getFieldDecorator('username', {
-                                rules: [{ required: true, message: 'Please input your username!' }],
+                            {getFieldDecorator('user_email', {
+                                rules: [{ required: true, message: 'Please input your email!' }],
                             })(
-                                <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="用户名" />
+                                <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="邮箱" />
                                 )}
                         </FormItem>
                         <FormItem>
-                            {getFieldDecorator('password', {
+                            {getFieldDecorator('user_pwd', {
                                 rules: [{ required: true, message: 'Please input your Password!' }],
                             })(
                                 <Input prefix={<Icon type="lock" style={{ fontSize: 13 }} />} type="password" placeholder="密码" />
@@ -101,10 +112,10 @@ class NormalLoginForm extends React.Component {
                             })(
                                 <Checkbox>记住我</Checkbox>
                                 )}
-                            <a style={{ float: 'right' }} href="">忘记密码</a>
+                            <a style={{ float: 'right' }} href="#" onClick={() => this.setState({visiblePwd: true})}>忘记密码</a>
                             <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
                                 登录
-                    </Button>
+                            </Button>
                             Or <a href="#" onClick={this.showModal}>注册!</a>
                         </FormItem>
                     </Form>
@@ -116,8 +127,18 @@ class NormalLoginForm extends React.Component {
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     footer={[]}
-                    >
-                    <NewUser onOk={this.handleOk}/>
+                >
+                    <NewUser onOk={this.handleOk} />
+                </Modal>
+
+                <Modal
+                    title="密码重置"
+                    visible={this.state.visiblePwd}
+                    onOk={() => this.setState({visiblePwd: false})}
+                    onCancel={() => this.setState({visiblePwd: false})}
+                    footer={[]}
+                >
+                    <ResetPassword onOk={() => this.setState({visiblePwd: false})} />
                 </Modal>
 
 

@@ -3,6 +3,7 @@ import React from 'react';
 import { Table, Icon, Button } from 'antd';
 
 import Cell from './EditCell';
+import FileUploadBtn from './FileUploadBtn'
  
 
 const data = [
@@ -36,7 +37,7 @@ export default class FileTable extends React.Component {
 
         return (
             <div>
-                <Button type="primary" icon="upload" style={{ marginBottom: 10 }}>上传</Button>
+                <FileUploadBtn />
                 <Table columns={this.columns} dataSource={data} />
             </div>
         )

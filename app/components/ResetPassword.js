@@ -1,7 +1,7 @@
 
 
 import React from 'react';
-import { Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete } from 'antd';
+import { Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete, message } from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const AutoCompleteOption = AutoComplete.Option;
@@ -15,27 +15,18 @@ class RegistrationForm extends React.Component {
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
-            if (!err) {
-                var user = {
-                    user_name: values.user_name,
-                    user_pwd: values.password,
-                    user_comp: values.user_comp,
-                    user_depar: values.user_depar,
-                    user_email: values.user_email,
-                    user_phone: values.user_phone
-                };
-
+            if (!err) {  
                 var users = JSON.parse(localStorage.users || '[]');
-                if (users.length === 0) {
-                    user.user_id = 1;
+
+                var user = users.filter(u => u.user_email === values.user_email);
+                if (user.length === 0) {
+                  message.error('此邮箱并没有被注册！');
                 } else {
-                    user.user_id = users[users.length - 1].user_id + 1;
+                    user[0].user_pwd = values.password;
+                    message.info('修改成功!'); 
+                    localStorage.users = JSON.stringify(users);
+                    this.props.onOk();
                 }
-
-                users.push(user);
-
-                localStorage.users = JSON.stringify(users);
-                this.props.onOk();
             }
         });
     }
@@ -58,16 +49,7 @@ class RegistrationForm extends React.Component {
         }
         callback();
     }
-
-    handleWebsiteChange = (value) => {
-        let autoCompleteResult;
-        if (!value) {
-            autoCompleteResult = [];
-        } else {
-            autoCompleteResult = ['.com', '.org', '.net'].map(domain => `${value}${domain}`);
-        }
-        this.setState({ autoCompleteResult });
-    }
+ 
 
     render() {
         const { getFieldDecorator } = this.props.form;
@@ -109,22 +91,7 @@ class RegistrationForm extends React.Component {
 
         return (
             <Form onSubmit={this.handleSubmit}>
-
-                <FormItem {...formItemLayout} label="姓名" hasFeedback>
-                    {getFieldDecorator('user_name', {
-                        rules: [{ required: true, message: '请输入姓名!', whitespace: true }],
-                    })(<Input />)}
-                </FormItem>
-                <FormItem {...formItemLayout} label="公司" hasFeedback>
-                    {getFieldDecorator('user_comp', {
-                        rules: [{ required: true, message: '请输入公司名称!', whitespace: true }],
-                    })(<Input />)}
-                </FormItem>
-                <FormItem {...formItemLayout} label="部门" hasFeedback>
-                    {getFieldDecorator('user_depar', {
-                        rules: [{ required: true, message: '请输入部门名称!', whitespace: true }],
-                    })(<Input />)}
-                </FormItem>
+   
 
                 <FormItem {...formItemLayout} label="邮箱" hasFeedback>
                     {getFieldDecorator('user_email', {
@@ -136,15 +103,8 @@ class RegistrationForm extends React.Component {
                     })(<Input />)}
                 </FormItem>
 
-                <FormItem {...formItemLayout} label="手机号" >
-                    {getFieldDecorator('user_phone', { rules: [{ required: true, message: '请输入手机号!' }], })
-                        (
-                        <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
-                        )}
-                </FormItem>
 
-
-                <FormItem {...formItemLayout} label="密码" hasFeedback  >
+                <FormItem {...formItemLayout} label="新密码" hasFeedback  >
                     {getFieldDecorator('password', {
                         rules: [{
                             required: true, message: '请输入密码!',
@@ -168,7 +128,7 @@ class RegistrationForm extends React.Component {
 
 
                 <FormItem {...tailFormItemLayout}>
-                    <Button type="primary" htmlType="submit">注册</Button>
+                    <Button type="primary" htmlType="submit">确定</Button>
                 </FormItem>
             </Form>
         );

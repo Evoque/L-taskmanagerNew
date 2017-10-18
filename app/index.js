@@ -14,36 +14,39 @@ import Login from './components/Login';
 
 class App extends React.Component {
 
-    state = {
-        isLogin: false
+    state = { 
+        loginUser: undefined
     }
- 
-    
+
+    handleLogin = (user_email) => {
+        this.setState({ loginUser: user_email });
+    }
+
 
     render() {
         let style = {};
-        if (this.state.isLogin) {
-          style = {
-              background: 'white'
-          }
+        if (this.state.loginUser) {
+            style = {
+                background: 'white'
+            }
         }
         return (
             <div className="container" style={style}>
-                 { 
-                     this.state.isLogin ? 
-                        <Tabs defaultActiveKey="1" style={{ width: '95%', margin: '10px auto'}}>
+                {
+                    this.state.loginUser ?
+                        <Tabs defaultActiveKey="1" style={{ width: '95%', margin: '10px auto' }}>
                             <TabPane className="container-panel" tab={<span><Icon type="usergroup-add" />用户信息管理</span>} key="1">
-                                <LTable />
+                                <LTable loginUser={this.state.loginUser} />
                             </TabPane>
-                            <TabPane  className="container-panel" tab={<span><Icon type="file" />文件管理</span>} key="2">
+                            <TabPane className="container-panel" tab={<span><Icon type="file" />文件管理</span>} key="2">
                                 <FileTable />
                             </TabPane>
-                            <TabPane className="container-panel"  tab={<span><Icon type="check-square-o" />进程管理</span>} key="3">
+                            <TabPane className="container-panel" tab={<span><Icon type="check-square-o" />进程管理</span>} key="3">
                                 Tab 2
                             </TabPane>
                         </Tabs>
-                         : <Login  login={() => this.setState({isLogin : true})}/> 
-                 } 
+                        : <Login login={this.handleLogin} />
+                }
             </div>
 
         )
