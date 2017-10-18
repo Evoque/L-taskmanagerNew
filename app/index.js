@@ -11,6 +11,7 @@ const TabPane = Tabs.TabPane;
 import LTable from './components/LTable';
 import FileTable from './components/FileTable';
 import Login from './components/Login';
+import PTable from './components/PTable';
 
 class App extends React.Component {
 
@@ -42,7 +43,7 @@ class App extends React.Component {
                                 <FileTable />
                             </TabPane>
                             <TabPane className="container-panel" tab={<span><Icon type="check-square-o" />进程管理</span>} key="3">
-                                Tab 2
+                            <PTable />
                             </TabPane>
                         </Tabs>
                         : <Login login={this.handleLogin} />
